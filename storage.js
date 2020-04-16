@@ -4,7 +4,7 @@ const isOk = (response) => {
     Promise.reject(new Error('Failed to load data from server'));
 }
 
-const storage = (url) => ({
+const storageFactory = (url) => ({
   getFile(userId, filename) {
     return fetch(`${url}/uploads/${userId}/${filename}`)
       .then(isOk)
@@ -67,4 +67,4 @@ const storage = (url) => ({
   }
 });
 
-export default storage;
+export default storageFactory;
