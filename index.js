@@ -1,16 +1,19 @@
 import authFactory from './auth';
 import dbFactory from './db';
 import createNewWebsocket from './ws';
+import storage from './storage';
 
 const createSdk = (url) => {
   const auth = authFactory(url);
   const db = dbFactory(url);
   const ws = () => createNewWebsocket(url);
+  const storage = storage(url);
 
   return {
     auth,
     db,
     ws,
+    storage,
   }
 };
 
