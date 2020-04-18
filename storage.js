@@ -31,9 +31,14 @@ const setOptions = (method, body) => {
 
 const storageFactory = (url) => ({
   getFile(userId, filename) {
-    const options = setOptions('GET')
+    const options = setOptions('GET');
+
     return fetch(`${url}/uploads/${userId}/${filename}`, options)
-      .then(isOk)
+      .then((response) => {
+        return response.ok ?
+          response :
+          Promise.reject(new Error('Failed to load data from server'));
+      })
   },
   getListOfUserFiles(userId) {
     const options = setOptions('GET');
