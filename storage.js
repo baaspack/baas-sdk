@@ -9,12 +9,24 @@ const headers = {
 }
 
 const setOptions = (method, body) => {
-  return {
+  const options = {
     method: method,
     headers,
     credentials: 'include',
-    body
   }
+
+  if (body) {
+    // make sure body is an object
+    const bodyType = typeof body;
+
+    if (bodyType !== 'object') {
+      body = { data: body };
+    }
+
+    options.body = body;
+  }
+
+  return options;
 }
 
 const storageFactory = (url) => ({
