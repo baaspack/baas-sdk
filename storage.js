@@ -4,26 +4,28 @@ const isOk = (response) => {
     Promise.reject(new Error('Failed to load data from server'));
 }
 
+const headers = {
+  authorization: 'API anotherSuperSecretThing',
+}
+
+const setOptions = (method, body) => {
+  return {
+    method: method,
+    headers,
+    credentials: 'include',
+    body
+  }
+}
+
 const storageFactory = (url) => ({
   getFile(userId, filename) {
-    const options = {
-      method: 'GET',
-      headers: {
-        authorization: 'API anotherSuperSecretThing',
-      },
-      credentials: 'include',
-    }
+    const options = setOptions('GET')
     return fetch(`${url}/uploads/${userId}/${filename}`, options)
       .then(isOk)
   },
   getListOfUserFiles(userId) {
-    const options = {
-      method: 'GET',
-      headers: {
-        authorization: 'API anotherSuperSecretThing',
-      },
-      credentials: 'include',
-    }
+    const options = setOptions('GET');
+
     return fetch(`${url}/uploads/${userId}`, options)
       .then(isOk)
   },
@@ -36,14 +38,7 @@ const storageFactory = (url) => ({
     data.append('filename', filename);
     data.append('file', fileFromFormData);
 
-    const options = {
-      method: 'POST',
-      body: data,
-      headers: {
-        authorization: 'API anotherSuperSecretThing',
-      },
-      credentials: 'include',
-    }
+    const options = setOptions('POST', data)
 
     return fetch(`${url}/uploads`, options)
       .then(isOk)
@@ -54,26 +49,13 @@ const storageFactory = (url) => ({
     newFormData.append('bucket', bucket);
     newFormData.append('filename', newFilename);
 
-    const options = {
-      method: 'PATCH',
-      body: newFormData,
-      headers: {
-        authorization: 'API anotherSuperSecretThing',
-      },
-      credentials: 'include',
-    }
+    const options = setOptions('PATCH', newFormData)
 
     return fetch(`${url}/uploads/${currentFilename}`, options)
       .then(isOk)
   },
   deleteFile(filename) {
-    const options = {
-      method: 'DELETE',
-      headers: {
-        authorization: 'API anotherSuperSecretThing',
-      },
-      credentials: 'include',
-    }
+    const options = setOptions('DELETE')
 
     return fetch(`${url}/uploads/${filename}`, options)
       .then(isOk)
@@ -84,14 +66,8 @@ const storageFactory = (url) => ({
     newFormData.append('filename', filename);
     newFormData.append('file', fileFromFormData);
 
-    const options = {
-      method: 'PUT',
-      body: newFormData,
-      headers: {
-        authorization: 'API anotherSuperSecretThing',
-      },
-      credentials: 'include',
-    }
+    const options = setOptions('PUT', newFormData);
+
     fetch(`${url}/uploads/${filename}`, options)
       .then(isOk)
   }
