@@ -6,11 +6,25 @@ const isOk = (response) => {
 
 const storageFactory = (url) => ({
   getFile(userId, filename) {
-    return fetch(`${url}/uploads/${userId}/${filename}`)
+    const options = {
+      method: 'GET',
+      headers: {
+        authorization: 'API anotherSuperSecretThing',
+      },
+      credentials: 'include',
+    }
+    return fetch(`${url}/uploads/${userId}/${filename}`, options)
       .then(isOk)
   },
   getListOfUserFiles(userId) {
-    return fetch(`${url}/uploads/${userId}`)
+    const options = {
+      method: 'GET',
+      headers: {
+        authorization: 'API anotherSuperSecretThing',
+      },
+      credentials: 'include',
+    }
+    return fetch(`${url}/uploads/${userId}`, options)
       .then(isOk)
   },
   uploadFile(fileFromFormData, filename, bucket) {
@@ -25,6 +39,10 @@ const storageFactory = (url) => ({
     const options = {
       method: 'POST',
       body: data,
+      headers: {
+        authorization: 'API anotherSuperSecretThing',
+      },
+      credentials: 'include',
     }
 
     return fetch(`${url}/uploads`, options)
@@ -39,6 +57,10 @@ const storageFactory = (url) => ({
     const options = {
       method: 'PATCH',
       body: newFormData,
+      headers: {
+        authorization: 'API anotherSuperSecretThing',
+      },
+      credentials: 'include',
     }
 
     return fetch(`${url}/uploads/${currentFilename}`, options)
@@ -47,22 +69,30 @@ const storageFactory = (url) => ({
   deleteFile(filename) {
     const options = {
       method: 'DELETE',
+      headers: {
+        authorization: 'API anotherSuperSecretThing',
+      },
+      credentials: 'include',
     }
 
     return fetch(`${url}/uploads/${filename}`, options)
       .then(isOk)
   },
   overwriteFile(fileFromFormData, filename) {
-    if (fileFromFormData.size === 0) { return 'no form submitted' }
+    if (!fileFromFormData) { return 'no form submitted' }
     const newFormData = new FormData();
     newFormData.append('filename', filename);
     newFormData.append('file', fileFromFormData);
 
     const options = {
       method: 'PUT',
-      body: newFormData
+      body: newFormData,
+      headers: {
+        authorization: 'API anotherSuperSecretThing',
+      },
+      credentials: 'include',
     }
-    fetch(`${url}/uploads/:filename`, options)
+    fetch(`${url}/uploads/${filename}`, options)
       .then(isOk)
   }
 });
