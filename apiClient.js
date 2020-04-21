@@ -1,10 +1,14 @@
+import config from './config';
+
 const isOk = (response) => {
   return response.ok ?
     response.json() :
     Promise.reject(new Error(response.statusText));
 };
 
-const sendRequest = (url, api_key, method = 'GET', body) => {
+const api_key = config.api_key;
+
+const sendRequest = (url, method = 'GET', body) => {
   const options = {
     method,
     headers: {
@@ -28,5 +32,7 @@ const sendRequest = (url, api_key, method = 'GET', body) => {
   return fetch(url, options)
     .then(isOk)
 }
+
+
 
 export default sendRequest;

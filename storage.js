@@ -1,10 +1,15 @@
+import config from './config';
+
 const isOk = (response) => {
   return response.ok ?
     response.json() :
     Promise.reject(new Error('Failed to load data from server'));
 }
 
-const storageFactory = (url, api_key) => ({
+const url = config.url;
+const api_key = config.api_key;
+
+const storageFactory = () => ({
   setOptions(method, body) {
     const options = {
       method: method,

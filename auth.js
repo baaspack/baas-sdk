@@ -1,14 +1,17 @@
 import sendRequest from './apiClient';
+import config from './config';
 
-const authFactory = (url, api_key) => ({
+const url = config.url;
+
+const authFactory = () => ({
   register(email, password) {
-    return sendRequest(`${url}/register`, api_key, 'POST', { email, password });
+    return sendRequest(`${url}/register`, 'POST', { email, password });
   },
   login(email, password) {
-    return sendRequest(`${url}/login`, api_key, 'POST', { email, password });
+    return sendRequest(`${url}/login`, 'POST', { email, password });
   },
   logout() {
-    return sendRequest(`${url}/logout`, api_key, 'POST');
+    return sendRequest(`${url}/logout`, 'POST');
   },
 });
 
