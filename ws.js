@@ -64,14 +64,20 @@ const wsFactory = (ws) => ({
       usersInformationCollection,
     });
   },
-  joinChannel({ usersInformationCollection, channelType, channelId, channelName, creatorId }) {
+  createChannel(usersInformationCollection, channelType, name) {
+    this.sendMessage({
+      action: 'createChannel',
+      usersInformationCollection,
+      channelType,
+      name,
+    });
+  },
+  joinChannel(usersInformationCollection, channelType, channelId) {
     this.sendMessage({
       action: 'joinChannel',
       usersInformationCollection,
       channelType,
       channelId,
-      channelName,
-      creatorId,
     });
   },
   leaveChannel(usersInformationCollection, channelType, channelId) {
@@ -82,14 +88,21 @@ const wsFactory = (ws) => ({
       channelId,
     });
   },
-  changeChannel({ usersInformationCollection, channelType, channelId, channelName, creatorId }) {
+  changeChannel(usersInformationCollection, channelType, channelId) {
     this.sendMessage({
       action: 'changeChannel',
       usersInformationCollection,
       channelType,
       channelId,
-      channelName,
-      creatorId,
+    });
+  },
+  deleteChannel(usersInformationCollection, channelMessagesCollection, channelType, channelId) {
+    this.sendMessage({
+      action: 'deleteChannel',
+      usersInformationCollection,
+      channelMessagesCollection,
+      channelType,
+      channelId,
     });
   },
   open(message) {
