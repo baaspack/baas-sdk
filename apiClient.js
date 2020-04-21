@@ -4,11 +4,11 @@ const isOk = (response) => {
     Promise.reject(new Error(response.statusText));
 };
 
-const sendRequest = (url, method = 'GET', body) => {
+const sendRequest = (url, api_key, method = 'GET', body) => {
   const options = {
     method,
     headers: {
-      authorization: 'API anotherSuperSecretThing',
+      authorization: api_key,
     },
     credentials: 'include',
   };
