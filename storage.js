@@ -1,5 +1,3 @@
-import config from './config';
-
 const storageFactory = (apiClient) => ({
   getFile(userId, filename) {
     return apiClient.sendRequest(`/uploads/${userId}/${filename}`);
