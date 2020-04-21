@@ -47,7 +47,7 @@ const storageFactory = (url) => ({
       .then(isOk)
   },
   uploadFile(fileFromFormData, filename, bucket) {
-    if (fileFromFormData.size === 0) { return 'no form submitted' }
+    if (!fileFromFormData.size) { return 'no form submitted' }
 
     const data = new FormData();
 
