@@ -1,18 +1,16 @@
-import config from './config';
-
 const isOk = (response) => {
   return response.ok ?
     response.json() :
     Promise.reject(new Error(response.statusText));
 };
 
-const api_key = config.api_key;
+const createApiClient = (hostname, apiKey) => (path, method = 'GET', body) => {
+  const requestUrl = `${hostname}${path}`.replace('//', '/');
 
-const sendRequest = (url, method = 'GET', body) => {
   const options = {
     method,
     headers: {
-      authorization: api_key,
+      authorization: `key ${apiKey}`,
     },
     credentials: 'include',
   };
@@ -25,14 +23,16 @@ const sendRequest = (url, method = 'GET', body) => {
       body = { data: body };
     }
 
-    options.headers['content-type'] = 'application/json';
-    options.body = JSON.stringify(body);
+    if (body instanceof FormData) {
+      options.body = body;
+    } else {
+      options.headers['content-type'] = 'application/json';
+      options.body = JSON.stringify(body);
+    }
   }
 
-  return fetch(url, options)
+  return fetch(requestUrl, options)
     .then(isOk)
-}
+};
 
-
-
-export default sendRequest;
+export default createApiClient;
