@@ -4,13 +4,46 @@ const isOk = (response) => {
     Promise.reject(new Error('Failed to load data from server'));
 }
 
+const headers = {
+  authorization: 'API anotherSuperSecretThing',
+}
+
+const setOptions = (method, body) => {
+  const options = {
+    method: method,
+    headers,
+    credentials: 'include',
+  }
+
+  if (body) {
+    // make sure body is an object
+    const bodyType = typeof body;
+
+    if (bodyType !== 'object') {
+      body = { data: body };
+    }
+
+    options.body = body;
+  }
+
+  return options;
+}
+
 const storageFactory = (url) => ({
   getFile(userId, filename) {
-    return fetch(`${url}/uploads/${userId}/${filename}`)
-      .then(isOk)
+    const options = setOptions('GET');
+
+    return fetch(`${url}/uploads/${userId}/${filename}`, options)
+      .then((response) => {
+        return response.ok ?
+          response :
+          Promise.reject(new Error('Failed to load data from server'));
+      })
   },
   getListOfUserFiles(userId) {
-    return fetch(`${url}/uploads/${userId}`)
+    const options = setOptions('GET');
+
+    return fetch(`${url}/uploads/${userId}`, options)
       .then(isOk)
   },
   uploadFile(fileFromFormData, filename, bucket) {
@@ -22,10 +55,7 @@ const storageFactory = (url) => ({
     data.append('filename', filename);
     data.append('file', fileFromFormData);
 
-    const options = {
-      method: 'POST',
-      body: data,
-    }
+    const options = setOptions('POST', data)
 
     return fetch(`${url}/uploads`, options)
       .then(isOk)
@@ -36,33 +66,26 @@ const storageFactory = (url) => ({
     newFormData.append('bucket', bucket);
     newFormData.append('filename', newFilename);
 
-    const options = {
-      method: 'PATCH',
-      body: newFormData,
-    }
+    const options = setOptions('PATCH', newFormData)
 
     return fetch(`${url}/uploads/${currentFilename}`, options)
       .then(isOk)
   },
   deleteFile(filename) {
-    const options = {
-      method: 'DELETE',
-    }
+    const options = setOptions('DELETE')
 
     return fetch(`${url}/uploads/${filename}`, options)
       .then(isOk)
   },
   overwriteFile(fileFromFormData, filename) {
-    if (fileFromFormData.size === 0) { return 'no form submitted' }
+    if (!fileFromFormData) { return 'no form submitted' }
     const newFormData = new FormData();
     newFormData.append('filename', filename);
     newFormData.append('file', fileFromFormData);
 
-    const options = {
-      method: 'PUT',
-      body: newFormData
-    }
-    fetch(`${url}/uploads/:filename`, options)
+    const options = setOptions('PUT', newFormData);
+
+    fetch(`${url}/uploads/${filename}`, options)
       .then(isOk)
   }
 });
