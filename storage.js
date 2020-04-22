@@ -1,6 +1,6 @@
 const storageFactory = (apiClient) => ({
   getFile(userId, filename) {
-    return apiClient.sendRequest(`/uploads/${userId}/${filename}`);
+    return apiClient.sendRequest(`/uploads/${userId}/${filename}`, 'GET', null, false);
   },
   getListOfUserFiles(userId) {
     return apiClient.sendRequest(`/uploads/${userId}`);
