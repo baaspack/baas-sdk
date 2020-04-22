@@ -474,15 +474,15 @@ Returns a `JSON` object containing an `action` property that is set to `'update'
 websocket.actions.overwriteResource('messages', '5e9f52b39bda1f125bdcf1a1', { text: '1st comment!' });
 
 => {
-  action: "update"
-  collection: "messages"
+  action: "update",
+  collection: "messages",
   response: {
-    _id: "5e9f52b39bda1f125bdcf1a1"
-    userId: "5e9b9e47a15aa8001eaf635a"
-    text: "1st comment!"
-    __v: 0
-    updatedAt: "2020-04-21T20:26:00.159Z"
-    createdAt: "2020-04-21T20:26:00.159Z"
+    _id: "5e9f52b39bda1f125bdcf1a1",
+    userId: "5e9b9e47a15aa8001eaf635a",
+    text: "1st comment!",
+    __v: 0,
+    updatedAt: "2020-04-21T20:26:00.159Z",
+    createdAt: "2020-04-21T20:26:00.159Z",
   }
 }
 ```
@@ -521,15 +521,15 @@ Returns a `JSON` object containing an `action` property that is set to `'delete'
 websocket.actions.deleteResource('messages', '5e9f52b39bda1f125bdcf1a1' });
 
 => {
-  action: "delete"
-  collection: "messages"
+  action: "delete",
+  collection: "messages",
   response: {
-    _id: "5e9f52b39bda1f125bdcf1a1"
-    userId: "5e9b9e47a15aa8001eaf635a"
-    text: "1st comment!"
-    __v: 0
-    updatedAt: "2020-04-21T20:26:00.159Z"
-    createdAt: "2020-04-21T20:26:00.159Z"
+    _id: "5e9f52b39bda1f125bdcf1a1",
+    userId: "5e9b9e47a15aa8001eaf635a",
+    text: "1st comment!",
+    __v: 0,
+    updatedAt: "2020-04-21T20:26:00.159Z",
+    createdAt: "2020-04-21T20:26:00.159Z",
   }
 }
 ```
@@ -541,7 +541,7 @@ websocket.actions.deleteResource('messages', '5e9f52b39bda1f125bdcf1a1' });
 [text to come...]
 
 ### Websocket Channels
-Channels functionality allows you to route websocket messages to the connections that should received them. For example, a Chat app with different Chat Rooms should only send messages from one room to the websocket connections that are subscribed to that room. It doesn't make sense to send those messages to all active websocket connections.
+Channels functionality allows you to route websocket messages to the connections that should receive them. For example, a Chat app with different Chat Rooms should only send messages from a room to the websocket connections that are subscribed to that room. It doesn't make sense to send those messages to all active websocket connections.
 
 To implement a basic app with channels functionality, two collection types are needed:
 
@@ -558,7 +558,7 @@ Example channel object:
 { channelType: "rooms", channelId: "5e9f1c70d84722112da48213" }
 ```
 
-If you want to store the channels your users' have subscribed to and the channel they were last engaged with, create a `usersInformationCollection` collection and include a field called `currentChannel` and a field called `channels`.
+If you want to store the channels your users have subscribed to and the channel they were last engaged with, create a `usersInformationCollection` collection and include a field called `currentChannel` and a field called `channels`.
 
 `currentChannel` takes a channel object. Examples:
 
@@ -829,7 +829,7 @@ The `currentChannel` and `channels` fields are then updated in the `usersInforma
 
 The channel referenced by the `channelType` and `channelId` arguments is deleted from the `channels` array.
 
-The `currentChannel` field is set to the first channel in the the user's `channels` field array if the array  isn't empty (e.g. `{ channelType: "rooms", channelId: "5e9f1c70d84722112da48213" }`), otherwise it is set to no channel (e.g. `{ channelType: null, channelId: null }`).
+The `currentChannel` field is set to the first channel in the the user's `channels` field array if the array isn't empty (e.g. `{ channelType: "rooms", channelId: "5e9f1c70d84722112da48213" }`), otherwise it is set to no channel (e.g. `{ channelType: null, channelId: null }`).
 
 Each active websocket connection that was 'subscribed' to the deleted channel is sent a message with updated `channels` and `currentChannel` values for that user.
 
@@ -863,7 +863,7 @@ websocket.actions.deleteChannel('usersmeta', 'rooms', '5e9f1efe9be921119dbfa714'
 ```
 
 ### Websocket & HTTP Responses
-When you make HTTP requests by calling the certain methods on the `db` object of the SDK (see the list below), the response from the database interaction is broadcast to active websocket connections.
+When you make HTTP requests by calling the methods on the `db` object of the SDK (see the list below), the response from the database interaction is broadcast to active websocket connections.
 
 If the response contains a `channelType` and `channelId` property, the message is only broadcast to active websocket connections who are 'subscribed' to that channel.
 
