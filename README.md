@@ -323,6 +323,7 @@ create
 update
 patch
 delete
+sendMessage
 joinUsersChannels
 createChannel
 joinChannel
@@ -333,29 +334,35 @@ open
 close
 ```
 
-You can create messages with custom actions that can be processed client-side. For example, if you want to notify all active websocket connections on the server that a user is typing a message, send the following message:
-
-```
-const message = {
-  action: 'userTyping',
-  userId,
-}
-
-websocket.actions.sendMessage(message);
-```
-
-You can then listen for a message that contains an `action` called `userTyping` and then handle it any way you wish.
-
-
 Here is a list of methods to interact with the database. 
 
 Note, you never have include the `userId` of the client that is calling a method--the server logs the `userId` on the initial `get` request when establishing the websocket connection through Backpack's authentication system.
 
+#### sendMessage(message)
+`message` should be an object with an `action` property created by the frontend developer.
 
-#####findResource(collection, query)
+This method simply broadcasts the given message to active websocket connections.
+
+If the `message` contains a `channelType` and `channelId` property, the message is only broadcast to active websocket connections who are subscribed to that channel. 
+
+If the `message`  DOES NOT contain a `channelType` and `channelId` property, the message is broadcast to ALL active websocket connections.
+
+Please see the <a href="https://github.com/baaspack/baas-sdk/blob/master/README.md#websocket-channels">Websocket Channels</a> section in this documentation for more information on Channels.
+
+```
+websocket.actions.sendMessage(message);
+
+=> {
+  action: 'userTyping',
+  userId: "5e9b9e47a15aa8001eaf635a"
+}
+```
+
+
+#### findResource(collection, query)
 `collection` should be a string. `query` should be an object. 
 
-Returns a `JSON` object containing an `action` property that is set to `'find'` and a `response` property that is set to an array of database records that match the query.
+Returns a `JSON` object containing an `action` property that is set to 'find' and a `response` property that is set to an array of database records that match the query.
 
 ```
 websocket.actions.findResource('messages', { userId: '5e9b9e47a15aa8001eaf635a' });
@@ -389,7 +396,7 @@ websocket.actions.findResource('messages', { userId: '5e9b9e47a15aa8001eaf635a' 
 #### getCollection(collection)
 `collection` should be a string.
 
-Returns a `JSON` object containing an `action` property that is set to `'getAll'`, a `collection` property that is set to the database collection name, and a `response` property that is set to an array of all of the database records in the collection.
+Returns a `JSON` object containing an `action` property that is set to 'getAll', a `collection` property that is set to the database collection name, and a `response` property that is set to an array of all of the database records in the collection.
 
 ```
 websocket.actions.getCollection('messages');
@@ -422,7 +429,7 @@ websocket.actions.getCollection('messages');
 #### getResource(collection, id)
 `collection` and `id` should be strings.
 
-Returns a `JSON` object containing an `action` property that is set to `'getOne'`, a `collection` property that is set to the database collection name, and a `response` property that is set to the requested database record.
+Returns a `JSON` object containing an `action` property that is set to 'getOne', a `collection` property that is set to the database collection name, and a `response` property that is set to the requested database record.
 
 ```
 websocket.actions.getResource('rooms', '5e9f1c70d84722112da48213');
@@ -447,7 +454,7 @@ websocket.actions.getResource('rooms', '5e9f1c70d84722112da48213');
 
 It is up to the frontend developer to ensure data integrity by placing constraints on the arguments that can be passed to this method.
 
-Returns a `JSON` object containing an `action` property that is set to `'create'`, a `collection` property that is set to the database collection name, and a `response` property that is set to the new database record.
+Returns a `JSON` object containing an `action` property that is set to 'create', a `collection` property that is set to the database collection name, and a `response` property that is set to the new database record.
 
 ```
 websocket.actions.createResource('messages', { userName: 'Sally', text: 'First message!' });
@@ -468,7 +475,7 @@ websocket.actions.createResource('messages', { userName: 'Sally', text: 'First m
 
 This method will overwrite the existing record with the key-value pairs in the `data` argument. Key-value pairs not included in `data` will be lost.
 
-Returns a `JSON` object containing an `action` property that is set to `'update'`, a `collection` property that is set to the database collection name, and a `response` property that is set to the overwritten database record.
+Returns a `JSON` object containing an `action` property that is set to 'update', a `collection` property that is set to the database collection name, and a `response` property that is set to the overwritten database record.
 
 ```
 websocket.actions.overwriteResource('messages', '5e9f52b39bda1f125bdcf1a1', { text: '1st comment!' });
@@ -492,7 +499,7 @@ websocket.actions.overwriteResource('messages', '5e9f52b39bda1f125bdcf1a1', { te
 
 This method will update the existing record by modifying existing fields and/or adding new ones. Existing key-value pairs not included in the `data` argument will remain in the document.
 
-Returns a `JSON` object containing an `action` property that is set to `'patch'`, a `collection` property that is set to the database collection name, and a `response` property that is set to the updated database record.
+Returns a `JSON` object containing an `action` property that is set to 'patch', a `collection` property that is set to the database collection name, and a `response` property that is set to the updated database record.
 
 ```
 websocket.actions.updateResource('messages', '5e9f52b39bda1f125bdcf1a1', { text: '1st message!' });
@@ -515,7 +522,7 @@ websocket.actions.updateResource('messages', '5e9f52b39bda1f125bdcf1a1', { text:
 #### deleteResource(collection, id)
 `collection` and `id` should be strings. `id` is the id of the resource to be deleted.
 
-Returns a `JSON` object containing an `action` property that is set to `'delete'`, a `collection` property that is set to the database collection name, and a `response` property that is set to the deleted database record.
+Returns a `JSON` object containing an `action` property that is set to 'delete', a `collection` property that is set to the database collection name, and a `response` property that is set to the deleted database record.
 
 ```
 websocket.actions.deleteResource('messages', '5e9f52b39bda1f125bdcf1a1' });
@@ -535,10 +542,32 @@ websocket.actions.deleteResource('messages', '5e9f52b39bda1f125bdcf1a1' });
 ```
 
 #### open(message)
-[text to come...]
+`message` should be an object.
+
+Broadcasts the given message as a `JSON` object to all active websocket connections. A `userId` property is added to the message.
+
+```
+websocket.actions.open(message);
+
+=> {
+  action: "open",
+  userId: "5e9b9e47a15aa8001eaf635a"
+}
+```
 
 #### close(message)
-[text to come...]
+`message` should be an object.
+
+Broadcasts the given message as a `JSON` object to all active websocket connections. A `userId` property is added to the message.
+
+```
+websocket.actions.close(message);
+
+=> {
+  action: "close",
+  userId: "5e9b9e47a15aa8001eaf635a"
+}
+```
 
 ### Websocket Channels
 Channels functionality allows you to route websocket messages to the connections that should receive them. For example, a Chat app with different Chat Rooms should only send messages from a room to the websocket connections that are subscribed to that room. It doesn't make sense to send those messages to all active websocket connections.
@@ -558,16 +587,17 @@ Example channel object:
 { channelType: "rooms", channelId: "5e9f1c70d84722112da48213" }
 ```
 
-If you want to store the channels your users have subscribed to and the channel they were last engaged with, create a `usersInformationCollection` collection and include a field called `currentChannel` and a field called `channels`.
+If you want to store the channels your users have subscribed to and the channel they were last engaged with, create a 'usersInformationCollection' collection (name it whatever you a like) and include a field called `currentChannel` and a field called `channels`.
 
-`currentChannel` takes a channel object. Examples:
+`currentChannel` takes a channel object. Two examples:
 
-If the user is a new user and has not engaged with any channels yet, or if the last channel the user engaged with was deleted and the user's `channels` field is an empty array:
+1. If the user is a new user and has not engaged with any channels yet, or if the last channel the user engaged with was deleted and the user's `channels` field is an empty array:
+
 ```
 channels: { channelType: null, channelId: null },
 ```
 
-The last channel a user engaged with:
+2. The last channel a user engaged with:
 ```
 channels: { channelType: "rooms", channelId: "5e9f1c70d84722112da48213" }
 ```
@@ -595,7 +625,7 @@ websocket.actions.createChannel('usersmeta', 'rooms', 'Burlington, VT Mountain B
 
 Two different messages are sent:
 
-1. All active websocket connections receive the following message (except for the client that called this method):
+1. All active websocket connections receive the following message except for the client that called this method:
 ```
 => {
   action: "createChannel",
@@ -647,7 +677,7 @@ Example method call:
 websocket.actions.joinUsersChannels('usersmeta');
 ```
 
-Only the websocket client that calls this method is sent the response message.
+Only the websocket client that called this method is sent the response message.
 ```
 => {
   action: "joinUsersChannels",
@@ -679,7 +709,7 @@ websocket.actions.joinChannel('usersmeta', 'rooms', '5e9f1e5c387d701181de03a9');
 
 Two different messages are sent:
 
-1. All active websocket connections subscribed to the channel defined by the `channelType` and `channelId` in the message body receive the following message (except for the client that called this method):
+1. All active websocket connections subscribed to the channel defined by the `channelType` and `channelId` in the message body receive the following message except for the client that called this method:
 ```
 => {
   action: "joinChannel",
@@ -736,7 +766,7 @@ websocket.actions.leaveChannel('usersmeta', 'rooms', '5e9f1e5c387d701181de03a9')
 
 Two different messages are sent:
 
-1. All active websocket connections subscribed to the channel defined by the `channelType` and `channelId` in the message body receive the following message (except for the client that called this method):
+1. All active websocket connections subscribed to the channel defined by the `channelType` and `channelId` in the message body receive the following message except for the client that called this method:
 
 ```
 websocket.actions.leaveChannel('usersmeta', 'rooms', '5e9f1e5c387d701181de03a9');
@@ -825,13 +855,13 @@ This method deletes the channel referenced by the `channelType` and `channelId` 
 - The message documents associated with the channel are deleted from the `channelMessagesCollection` collection
 - The channel document is deleted from the `channelType` collection
 
-The `currentChannel` and `channels` fields are then updated in the `usersInformationCollection` document for each user that is 'subscribed' to the channel.
+The `currentChannel` and `channels` fields are then updated in the `usersInformationCollection` document for each user that is subscribed to the channel.
 
 The channel referenced by the `channelType` and `channelId` arguments is deleted from the `channels` array.
 
 The `currentChannel` field is set to the first channel in the the user's `channels` field array if the array isn't empty (e.g. `{ channelType: "rooms", channelId: "5e9f1c70d84722112da48213" }`), otherwise it is set to no channel (e.g. `{ channelType: null, channelId: null }`).
 
-Each active websocket connection that was 'subscribed' to the deleted channel is sent a message with updated `channels` and `currentChannel` values for that user.
+Each active websocket connection that was subscribed to the deleted channel is sent a message with updated `channels` and `currentChannel` values for that user.
 
 For this method to work, the `usersInformationCollection` collection must contain a field called `currentChannel` and a field called `channels` as described above.
 
@@ -865,9 +895,9 @@ websocket.actions.deleteChannel('usersmeta', 'rooms', '5e9f1efe9be921119dbfa714'
 ### Websocket & HTTP Responses
 When you make HTTP requests by calling the methods on the `db` object of the SDK (see the list below), the response from the database interaction is broadcast to active websocket connections.
 
-If the response contains a `channelType` and `channelId` property, the message is only broadcast to active websocket connections who are 'subscribed' to that channel.
+If the response contains a `channelType` and `channelId` property, the message is only broadcast to active websocket connections who are subscribed to that channel.
 
-If the response DOES NOT contain a `channelType` and `channelId` property, the message is broadcast to ALL active websocket connections.
+If the response does not contain a `channelType` and `channelId` property, the message is broadcast to all active websocket connections.
 
 If you don't want the response broadcast to any websocket connections, include a property in the document called `broadcast` and set it to `false`. It is recommended that you do this on your `usersInformationCollection` collection.
 
@@ -877,21 +907,3 @@ Methods that will broadcast the response from interacting with the database:
 - `db.updateResource(collection, id, data)`
 - `db.overwriteResource(collection, id, data)`
 - `db.deleteResource(collection, id)`
-
-#### broadcast(message)
-`message` should be an object with an `action` property created by the frontend developer.
-
-The methods simply broadcasts the given message argument to active websocket connections.
-
-If the `message` contains a`channelType` and `channelId` property, the message is only broadcast to active websocket connections who are 'subscribed' to that channel.
-
-If the `message`  DOES NOT contain a `channelType` and `channelId` property, the message is broadcast to ALL active websocket connections.
-
-```
-websocket.actions.sendMessage(message);
-
-=> {
-  action: 'userTyping',
-  userId: "5e9b9e47a15aa8001eaf635a"
-}
-```
