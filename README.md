@@ -4,10 +4,13 @@
 ## Installing the SDK
 
 1. Configuring the SDK
-Link to the relevant script files in your HTML files  
+
+Link to the relevant script files in your HTML files 
+
 `<script src=”https://admin.yourBackpack.com/sdk.js”></script>`
 
 2. Call the `createSdk` method from your JavaScript code with the Backpack’s unique URL and API key. 
+
 `const sdk = createSdk('https://mySweetApp.myDomain.com/', 'aLong&RandomApiKey');`
 
 The object returned by `createSdk` exposes Backpack’s functionality through modules that each represent a core Backpack component: collection management, data persistence, user authentication, file storage, realtime communication over websockets. 
@@ -17,7 +20,7 @@ The object returned by `createSdk` exposes Backpack’s functionality through mo
 
 ### Authentication:
 
-For security purposes, the Users collection that contains the email and password for each user is not accessible from the API. 
+For security purposes, the Users collection that contains the email and encrypted password for each user is not accessible from the API. 
 
 #### register(email, password)
 `email` and `password` should be strings. The user will be registered using their email as their username. Returns a JSON object with the user's ID.
@@ -61,7 +64,7 @@ sdk.db.getCollectionList()
 
   
 #### createNewCollection(collectionName)
-`collectionName` should be a string. Creates a new collection in the database. Returns the name of the collection. The new collection will not actually be created and it will not appear in the list of collections until a record is added to it.
+`collectionName` should be a string. Creates a new set of routes for the collection. Returns the name of the collection.The actual collection will be created when a record is added to it. It will not appear in the list of collections until the first record has been added.
 
 ```
 sdk.db.createNewCollection('messages')
@@ -110,10 +113,10 @@ sdk.db.getResource('messages', '5e9f2eee0fb8891a90d642a2')
   
 
 #### createResource(collection, data)
-`collection` should be a string. `data` should be an object. The data argument can contain any key-value pairs. It is up to the frontend developer to ensure data integrity by placing constraints on the arguments that can be passed to this method.
+`collection` should be a string. `data` should be an object. The data argument can contain any key-value pairs. It is up to the frontend developer to ensure data integrity by placing constraints on the arguments that can be passed to this method. Timestamps and unique ID will be added automatically.
 
 ```
-sdk.db.createResource('messages', {})
+sdk.db.createResource('messages', { "text": "I am a message!" })
 => {
     "_id": "5e9f2fc00fb8899611d642a4",
     "text": "I am a message!",
@@ -135,16 +138,25 @@ sdk.db.updateResource('messages', '5e9f2fc00fb8899611d642a4', {"text": "updated 
     "updatedAt": "2020-04-21T18:08:35.297Z",
     "createdAt": "2020-04-21T18:08:35.297Z"
 }
+sdk.db.createResource('messages', { "new_field": "some other information" })
+=> {
+    "_id": "5e9f2fc00fb8899611d642a4",
+    "text": "updated message",
+    "new_field": "some other information",
+    "createdAt": "2020-04-21T17:39:12.829Z",
+    "updatedAt": "2020-04-21T17:39:12.829Z",
+    "__v": 0
+}
 ```
   
 #### overwriteResource(collection, id, data)
 `collection` and `id` should be strings. `data` should be an object containing the key-value pairs to be updated. This method will overwrite the existing record with the key-value pairs in the `data` argument. Key-value pairs not included in `data` will be lost.
 
 ```
-sdk.db.updateResource('messages', '5e9f2fc00fb8899611d642a4', {"text": "updated message"})
+sdk.db.updateResource('messages', '5e9f2fc00fb8899611d642a4', {"new_key": "some value"})
 => {
     "_id": "5e9f2fc00fb8899611d642a4",
-    "text": "updated message",
+    "new_key": "some value",
     "__v": 0,
     "updatedAt": "2020-04-21T18:08:35.297Z",
     "createdAt": "2020-04-21T18:08:35.297Z"
@@ -168,12 +180,20 @@ sdk.db.deleteResource('messages', '5e9f2fc00fb8899611d642a4')
 ### File storage:
 
 #### getFile(userId, filename)
-Returns file from `current_user_id/filename` in the body of the response. `filename` should be a string. 
+Returns the file in the body of the response. The file is identified by filename and the userId of the user who uploaded it. `filename` should be a string. 
 
-Can be accessed by calling `.blob()` on the response body, creating a url by calling `URL.createObjectURL()` on the blob file, and using the return value as the value for the `src` attribute in the html. See MDN
-
+Can be accessed by calling `.blob()` on the response body, creating a url by calling `URL.createObjectURL()` on the blob file, and using the return value as the value for the `src` attribute in the html. See MDN: https://developer.mozilla.org/en-US/docs/Web/API/Body/blob
 ```
-sdk.storage.getFile()
+sdk.storage.getFile("5e9f38f8126233001e2dc194", "my_photo.jpg");
+=>      {
+            "_id": "5e9f38f8126233001e2dc194",
+            "userId": "5e876354eb2b13001ea7097a",
+            "filename": "my_photo.jpg",
+            "bucket": "none",
+            "createdAt": "2020-04-21T18:18:32.365Z",
+            "updatedAt": "2020-04-21T18:18:32.365Z",
+            "__v": 0
+        }
 ```
 
 #### getListOfUserFiles(userId)
@@ -182,8 +202,8 @@ sdk.storage.getFile()
 ```
 sdk.storage.getListOfUserFiles('5e876354eb2b13001ea7097a')
 
-=>  [
-{      
+=>  { records: 
+      [      
         {
             "_id": "5e9f38f8126233001e2dc194",
             "userId": "5e876354eb2b13001ea7097a",
@@ -202,8 +222,8 @@ sdk.storage.getListOfUserFiles('5e876354eb2b13001ea7097a')
             "updatedAt": "2020-04-21T18:27:56.797Z",
             "__v": 0
         }
-    ]
-}
+      ]
+    }
 ```
 
 #### uploadFile(fileFromFormData, filename, bucket)
@@ -270,7 +290,7 @@ sdk.storage.deleteFile('new_photo_name, jpg')
 ```
   
 
-### Websocket
+### Websocket Messages
 
 To create a websocket connection, call the `ws()` method on the `sdk` object:
 
@@ -291,8 +311,7 @@ websocket.onmessage = (e) => {
 }
 ```
 
-Messages always include an `action` property set to a `string` that tells the server how to process the message. Once the message is processed, the server sends a message to the client with the same `action` property value along with additional information cooresponding to the action. 
-
+Messages always include an `action` property set to a `string` that tells the server how to process the message. Once the message is processed, the server sends a message to the client with the same `action` property value along with additional information corresponding to the action. 
 
 Here are the list of actions:
 
@@ -333,7 +352,7 @@ Here is a list of methods to interact with the database.
 Note, you never have include the `userId` of the client that is calling a method--the server logs the `userId` on the initial `get` request when establishing the websocket connection through Backpack's authentication system.
 
 
-##### findResource(collection, query)
+#####findResource(collection, query)
 `collection` should be a string. `query` should be an object. 
 
 Returns a `JSON` object containing an `action` property that is set to `'find'` and a `response` property that is set to an array of database records that match the query.
@@ -367,7 +386,7 @@ websocket.actions.findResource('messages', { userId: '5e9b9e47a15aa8001eaf635a' 
 
 ```
 
-##### getCollection(collection)
+#### getCollection(collection)
 `collection` should be a string.
 
 Returns a `JSON` object containing an `action` property that is set to `'getAll'`, a `collection` property that is set to the database collection name, and a `response` property that is set to an array of all of the database records in the collection.
@@ -400,7 +419,7 @@ websocket.actions.getCollection('messages');
 }
 ```
 
-##### getResource(collection, id)
+#### getResource(collection, id)
 `collection` and `id` should be strings.
 
 Returns a `JSON` object containing an `action` property that is set to `'getOne'`, a `collection` property that is set to the database collection name, and a `response` property that is set to the requested database record.
@@ -423,7 +442,7 @@ websocket.actions.getResource('rooms', '5e9f1c70d84722112da48213');
 }
 ```
 
-##### createResource(collection, data)
+#### createResource(collection, data)
 `collection` should be a string. `data` should be an object. The data argument can contain any key-value pairs. 
 
 It is up to the frontend developer to ensure data integrity by placing constraints on the arguments that can be passed to this method.
@@ -444,7 +463,7 @@ websocket.actions.createResource('messages', { userName: 'Sally', text: 'First m
 }
 ```
 
-##### overwriteResource(collection, id, data)
+#### overwriteResource(collection, id, data)
 `collection` and `id` should be strings. `data` should be an object containing the key-value pairs to be updated. 
 
 This method will overwrite the existing record with the key-value pairs in the `data` argument. Key-value pairs not included in `data` will be lost.
@@ -468,7 +487,7 @@ websocket.actions.overwriteResource('messages', '5e9f52b39bda1f125bdcf1a1', { te
 }
 ```
 
-##### updateResource(collection, id, data)
+#### updateResource(collection, id, data)
 `collection` and `id` should be strings. `data` should be an object containing the key-value pairs to be updated.
 
 This method will update the existing record by modifying existing fields and/or adding new ones. Existing key-value pairs not included in the `data` argument will remain in the document.
@@ -493,7 +512,7 @@ websocket.actions.updateResource('messages', '5e9f52b39bda1f125bdcf1a1', { text:
 }
 ```
 
-##### deleteResource(collection, id)
+#### deleteResource(collection, id)
 `collection` and `id` should be strings. `id` is the id of the resource to be deleted.
 
 Returns a `JSON` object containing an `action` property that is set to `'delete'`, a `collection` property that is set to the database collection name, and a `response` property that is set to the deleted database record.
@@ -515,13 +534,13 @@ websocket.actions.deleteResource('messages', '5e9f52b39bda1f125bdcf1a1' });
 }
 ```
 
-##### open(message)
+#### open(message)
 [text to come...]
 
-##### close(message)
+#### close(message)
 [text to come...]
 
-#### Websocket Channels
+### Websocket Channels
 Channels functionality allows you to route websocket messages to the connections that should received them. For example, a Chat app with different Chat Rooms should only send messages from one room to the websocket connections that are subscribed to that room. It doesn't make sense to send those messages to all active websocket connections.
 
 To implement a basic app with channels functionality, two collection types are needed:
@@ -562,7 +581,7 @@ channels: [
 ],
 ```
 
-##### createChannel(usersInformationCollection, channelType, name)
+#### createChannel(usersInformationCollection, channelType, name)
 `usersInformationCollection`, `channelType`, and `name` should be a string.
 
 This method creates a new channel document.
@@ -616,7 +635,7 @@ Two different messages are sent:
 }
 ```
 
-##### joinUsersChannels(usersInformationCollection)
+#### joinUsersChannels(usersInformationCollection)
 `usersInformationCollection` should be a string.
 
 This method returns a list of channels the user is subscribed to.
@@ -643,7 +662,7 @@ Only the websocket client that calls this method is sent the response message.
 }
 ```
 
-##### joinChannel(usersInformationCollection, channelType, channelId)
+#### joinChannel(usersInformationCollection, channelType, channelId)
 `usersInformationCollection`, `channelType`, and `channelId` should be strings.
 
 This method subscribes a user to the channel referenced by the `channelType` and `channelId` arguments and updates the following fields in the user's `usersInformationCollection` document:
@@ -700,7 +719,7 @@ websocket.actions.joinChannel('usersmeta', 'rooms', '5e9f1e5c387d701181de03a9');
 }
 ```
 
-##### leaveChannel(usersInformationCollection, channelType, channelId)
+#### leaveChannel(usersInformationCollection, channelType, channelId)
 `usersInformationCollection`, `channelType`, and `channelId` should be strings.
 
 This method unsubscribes a user from the channel referenced by the `channelType` and `channelId` arguments and updates the following fields in the user's `usersInformationCollection` document:
@@ -760,7 +779,7 @@ websocket.actions.leaveChannel('usersmeta', 'rooms', '5e9f1e5c387d701181de03a9')
 }
 ```
 
-##### changeChannel(usersInformationCollection, channelType, channelId)
+#### changeChannel(usersInformationCollection, channelType, channelId)
 `usersInformationCollection`, `channelType`, and `channelId` should be strings.
 
 This method changes the user's current channel to the channel referenced by the `channelType` and `channelId` arguments by updating the `currentChannel` field in the user's `usersInformationCollection` document.
@@ -799,7 +818,7 @@ Only the client that called this method is sent the following response message. 
 }
 ```
 
-##### deleteChannel(usersInformationCollection, channelMessagesCollection, channelType, channelId)
+#### deleteChannel(usersInformationCollection, channelMessagesCollection, channelType, channelId)
 `usersInformationCollection`, `channelMessagesCollection`, `channelType`, and `channelId` should be strings.
 
 This method deletes the channel referenced by the `channelType` and `channelId` arguments:
@@ -843,7 +862,7 @@ websocket.actions.deleteChannel('usersmeta', 'rooms', '5e9f1efe9be921119dbfa714'
 }
 ```
 
-#### Websocket & HTTP Responses
+### Websocket & HTTP Responses
 When you make HTTP requests by calling the certain methods on the `db` object of the SDK (see the list below), the response from the database interaction is broadcast to active websocket connections.
 
 If the response contains a `channelType` and `channelId` property, the message is only broadcast to active websocket connections who are 'subscribed' to that channel.
@@ -859,7 +878,7 @@ Methods that will broadcast the response from interacting with the database:
 - `db.overwriteResource(collection, id, data)`
 - `db.deleteResource(collection, id)`
 
-##### broadcast(message)
+#### broadcast(message)
 `message` should be an object with an `action` property created by the frontend developer.
 
 The methods simply broadcasts the given message argument to active websocket connections.
