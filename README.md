@@ -290,7 +290,7 @@ sdk.storage.deleteFile('new_photo_name, jpg')
 ```
   
 
-### Websocket Messages
+### Websocket
 
 To create a websocket connection, call the `ws()` method on the `sdk` object:
 
