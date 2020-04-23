@@ -323,7 +323,7 @@ create
 update
 patch
 delete
-sendMessage
+broadcast
 joinUsersChannels
 createChannel
 joinChannel
@@ -338,8 +338,8 @@ Here is a list of methods to interact with the database.
 
 Note, you never have include the `userId` of the client that is calling a method--the server logs the `userId` on the initial `get` request when establishing the websocket connection through Backpack's authentication system.
 
-#### sendMessage(message)
-`message` should be an object with an `action` property created by the frontend developer.
+#### broadcast(message)
+`message` should be an object.
 
 This method simply broadcasts the given message to active websocket connections.
 
@@ -350,14 +350,14 @@ If the `message`  DOES NOT contain a `channelType` and `channelId` property, the
 Please see the <a href="https://github.com/baaspack/baas-sdk/blob/master/README.md#websocket-channels">Websocket Channels</a> section in this documentation for more information on Channels.
 
 ```
-websocket.actions.sendMessage(message);
+websocket.actions.broadcast(message);
 
 => {
-  action: 'userTyping',
+  action: 'broadcast',
+  customAction: 'userTyping',
   userId: "5e9b9e47a15aa8001eaf635a"
 }
 ```
-
 
 #### findResource(collection, query)
 `collection` should be a string. `query` should be an object. 
