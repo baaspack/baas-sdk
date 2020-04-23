@@ -1,30 +1,27 @@
-import sendRequest from './apiClient';
-
-const dbFactory = (url) => ({
+const dbFactory = (apiClient) => ({
   getCollection(collection) {
-    return sendRequest(`${url}/${collection}`);
+    return apiClient.sendRequest(`/${collection}`);
   },
   getResource(collection, id) {
-    return sendRequest(`${url}/${collection}/${id}`);
+    return apiClient.sendRequest(`/${collection}/${id}`);
   },
   createResource(collection, data) {
-    return sendRequest(`${url}/${collection}`, 'POST', data);
+    return apiClient.sendRequest(`/${collection}`, 'POST', data);
   },
   deleteResource(collection, id) {
-    return sendRequest(`${url}/${collection}/${id}`, 'DELETE');
+    return apiClient.sendRequest(`/${collection}/${id}`, 'DELETE');
   },
   updateResource(collection, id, data) {
-    return sendRequest(`${url}/${collection}/${id}`, 'PATCH', data)
-      .then((updatedResource) => console.log(updatedResource));
+    return apiClient.sendRequest(`/${collection}/${id}`, 'PATCH', data);
   },
   overwriteResource(collection, id, data) {
-    return sendRequest(`${url}/${collection}/${id}`, 'PUT', data)
+    return apiClient.sendRequest(`/${collection}/${id}`, 'PUT', data);
   },
   getCollectionsList() {
-    return sendRequest(`${url}/collections`)
+    return apiClient.sendRequest('/collections')
   },
   createNewCollection(collectionName) {
-    return sendRequest(`${url}/collections`, 'POST', { collectionName })
+    return apiClient.sendRequest('/collections', 'POST', { collectionName });
   },
 });
 
