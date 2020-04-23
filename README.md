@@ -3,6 +3,7 @@
 
 ## Installing the SDK
 
+<<<<<<< HEAD
 1. Configuring the SDK
 
 Link to the relevant script files in your HTML files 
@@ -15,12 +16,19 @@ Link to the relevant script files in your HTML files
 
 The object returned by `createSdk` exposes Backpack’s functionality through modules that each represent a core Backpack component: collection management, data persistence, user authentication, file storage, realtime communication over websockets. 
 
+=======
+...
+>>>>>>> constructor
 ## SDK Methods
 
 
 ### Authentication:
 
+<<<<<<< HEAD
 For security purposes, the Users collection that contains the email and encrypted password for each user is not accessible from the API. 
+=======
+For security purposes, the Users collection that contains the email and password for each user is not accessible from the API. 
+>>>>>>> constructor
 
 #### register(email, password)
 `email` and `password` should be strings. The user will be registered using their email as their username. Returns a JSON object with the user's ID.
@@ -64,7 +72,11 @@ sdk.db.getCollectionList()
 
   
 #### createNewCollection(collectionName)
+<<<<<<< HEAD
 `collectionName` should be a string. Creates a new set of routes for the collection. Returns the name of the collection.The actual collection will be created when a record is added to it. It will not appear in the list of collections until the first record has been added.
+=======
+`collectionName` should be a string. Creates a new collection in the database. Returns the name of the collection. The new collection will not actually be created and it will not appear in the list of collections until a record is added to it.
+>>>>>>> constructor
 
 ```
 sdk.db.createNewCollection('messages')
@@ -113,10 +125,17 @@ sdk.db.getResource('messages', '5e9f2eee0fb8891a90d642a2')
   
 
 #### createResource(collection, data)
+<<<<<<< HEAD
 `collection` should be a string. `data` should be an object. The data argument can contain any key-value pairs. It is up to the frontend developer to ensure data integrity by placing constraints on the arguments that can be passed to this method. Timestamps and unique ID will be added automatically.
 
 ```
 sdk.db.createResource('messages', { "text": "I am a message!" })
+=======
+`collection` should be a string. `data` should be an object. The data argument can contain any key-value pairs. It is up to the frontend developer to ensure data integrity by placing constraints on the arguments that can be passed to this method.
+
+```
+sdk.db.createResource('messages', {})
+>>>>>>> constructor
 => {
     "_id": "5e9f2fc00fb8899611d642a4",
     "text": "I am a message!",
@@ -125,43 +144,9 @@ sdk.db.createResource('messages', { "text": "I am a message!" })
     "__v": 0
 }
 ```
-
-#### updateResource(collection, id, data)
-`collection` and `id` should be strings. `data` should be an object containing the key-value pairs to be updated. This method will update the existing record by modifying existing fields and/or adding new ones. Existing key-value pairs not included in the `data` argument will remain in the document.
-
-```
-sdk.db.updateResource('messages', '5e9f2fc00fb8899611d642a4', {"text": "updated message"})
-=> {
-    "_id": "5e9f2fc00fb8899611d642a4",
-    "text": "updated message",
-    "__v": 0,
-    "updatedAt": "2020-04-21T18:08:35.297Z",
-    "createdAt": "2020-04-21T18:08:35.297Z"
-}
-sdk.db.createResource('messages', { "new_field": "some other information" })
-=> {
-    "_id": "5e9f2fc00fb8899611d642a4",
-    "text": "updated message",
-    "new_field": "some other information",
-    "createdAt": "2020-04-21T17:39:12.829Z",
-    "updatedAt": "2020-04-21T17:39:12.829Z",
-    "__v": 0
-}
-```
+<<<<<<< HEAD
+=======
   
-#### overwriteResource(collection, id, data)
-`collection` and `id` should be strings. `data` should be an object containing the key-value pairs to be updated. This method will overwrite the existing record with the key-value pairs in the `data` argument. Key-value pairs not included in `data` will be lost.
-
-```
-sdk.db.updateResource('messages', '5e9f2fc00fb8899611d642a4', {"new_key": "some value"})
-=> {
-    "_id": "5e9f2fc00fb8899611d642a4",
-    "new_key": "some value",
-    "__v": 0,
-    "updatedAt": "2020-04-21T18:08:35.297Z",
-    "createdAt": "2020-04-21T18:08:35.297Z"
-}
-```
 
 #### deleteResource(collection, id)
 `collection` and `id` should be strings. `id` is the id of the resource to be deleted.
@@ -176,10 +161,79 @@ sdk.db.deleteResource('messages', '5e9f2fc00fb8899611d642a4')
     "__v": 0
 }
 ```  
+>>>>>>> constructor
+
+#### updateResource(collection, id, data)
+`collection` and `id` should be strings. `data` should be an object containing the key-value pairs to be updated. This method will update the existing record by modifying existing fields and/or adding new ones. Existing key-value pairs not included in the `data` argument will remain in the document.
+
+```
+sdk.db.updateResource('messages', '5e9f2fc00fb8899611d642a4', {"text": "updated message"})
+=> {
+    "_id": "5e9f2fc00fb8899611d642a4",
+    "text": "updated message",
+    "__v": 0,
+    "updatedAt": "2020-04-21T18:08:35.297Z",
+    "createdAt": "2020-04-21T18:08:35.297Z"
+}
+<<<<<<< HEAD
+sdk.db.createResource('messages', { "new_field": "some other information" })
+=> {
+    "_id": "5e9f2fc00fb8899611d642a4",
+    "text": "updated message",
+    "new_field": "some other information",
+    "createdAt": "2020-04-21T17:39:12.829Z",
+    "updatedAt": "2020-04-21T17:39:12.829Z",
+    "__v": 0
+}
+```
+  
+=======
+```
+  
+
+>>>>>>> constructor
+#### overwriteResource(collection, id, data)
+`collection` and `id` should be strings. `data` should be an object containing the key-value pairs to be updated. This method will overwrite the existing record with the key-value pairs in the `data` argument. Key-value pairs not included in `data` will be lost.
+
+```
+<<<<<<< HEAD
+sdk.db.updateResource('messages', '5e9f2fc00fb8899611d642a4', {"new_key": "some value"})
+=> {
+    "_id": "5e9f2fc00fb8899611d642a4",
+    "new_key": "some value",
+=======
+sdk.db.updateResource('messages', '5e9f2fc00fb8899611d642a4', {"text": "updated message"})
+=> {
+    "_id": "5e9f2fc00fb8899611d642a4",
+    "text": "updated message",
+>>>>>>> constructor
+    "__v": 0,
+    "updatedAt": "2020-04-21T18:08:35.297Z",
+    "createdAt": "2020-04-21T18:08:35.297Z"
+}
+```
+
+<<<<<<< HEAD
+#### deleteResource(collection, id)
+`collection` and `id` should be strings. `id` is the id of the resource to be deleted.
+
+```
+sdk.db.deleteResource('messages', '5e9f2fc00fb8899611d642a4')
+=> {
+    "_id": "5e9f2fc00fb8899611d642a4",
+    "text": "I am a message!",
+    "createdAt": "2020-04-21T17:39:12.829Z",
+    "updatedAt": "2020-04-21T17:39:12.829Z",
+    "__v": 0
+}
+```  
+=======
+>>>>>>> constructor
   
 ### File storage:
 
 #### getFile(userId, filename)
+<<<<<<< HEAD
 Returns the file in the body of the response. The file is identified by filename and the userId of the user who uploaded it. `filename` should be a string. 
 
 Can be accessed by calling `.blob()` on the response body, creating a url by calling `URL.createObjectURL()` on the blob file, and using the return value as the value for the `src` attribute in the html. See MDN: https://developer.mozilla.org/en-US/docs/Web/API/Body/blob
@@ -194,6 +248,14 @@ sdk.storage.getFile("5e9f38f8126233001e2dc194", "my_photo.jpg");
             "updatedAt": "2020-04-21T18:18:32.365Z",
             "__v": 0
         }
+=======
+Returns file from `current_user_id/filename` in the body of the response. `filename` should be a string. 
+
+Can be accessed by calling `.blob()` on the response body, creating a url by calling `URL.createObjectURL()` on the blob file, and using the return value as the value for the `src` attribute in the html. See MDN
+
+```
+sdk.storage.getFile()
+>>>>>>> constructor
 ```
 
 #### getListOfUserFiles(userId)
@@ -202,8 +264,13 @@ sdk.storage.getFile("5e9f38f8126233001e2dc194", "my_photo.jpg");
 ```
 sdk.storage.getListOfUserFiles('5e876354eb2b13001ea7097a')
 
+<<<<<<< HEAD
 =>  { records: 
       [      
+=======
+=>  [
+{      
+>>>>>>> constructor
         {
             "_id": "5e9f38f8126233001e2dc194",
             "userId": "5e876354eb2b13001ea7097a",
@@ -222,8 +289,13 @@ sdk.storage.getListOfUserFiles('5e876354eb2b13001ea7097a')
             "updatedAt": "2020-04-21T18:27:56.797Z",
             "__v": 0
         }
+<<<<<<< HEAD
       ]
     }
+=======
+    ]
+}
+>>>>>>> constructor
 ```
 
 #### uploadFile(fileFromFormData, filename, bucket)
@@ -288,6 +360,7 @@ sdk.storage.deleteFile('new_photo_name, jpg')
     }
 }
 ```
+<<<<<<< HEAD
   
 
 ### Websocket Messages
@@ -907,3 +980,5 @@ Methods that will broadcast the response from interacting with the database:
 - `db.updateResource(collection, id, data)`
 - `db.overwriteResource(collection, id, data)`
 - `db.deleteResource(collection, id)`
+=======
+>>>>>>> constructor

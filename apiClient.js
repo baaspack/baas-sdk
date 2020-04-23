@@ -1,32 +1,43 @@
-const isOk = (response) => {
-  return response.ok ?
-    response.json() :
-    Promise.reject(new Error(response.statusText));
+const isOk = (response, isJson) => {
+  if (response.ok) {
+    return isJson ? response.json() : response;
+  }
+  return Promise.reject(new Error(response.statusText));
 };
 
-const sendRequest = (url, method = 'GET', body) => {
-  const options = {
-    method,
-    headers: {
-      authorization: 'API anotherSuperSecretThing',
-    },
-    credentials: 'include',
-  };
+const createApiClient = (hostname, apiKey) => {
+  return ({
+    sendRequest(path, method = 'GET', body, isJson = true) {
+      const requestUrl = `${hostname}${path}`;
 
-  if (body) {
-    // make sure body is an object
-    const bodyType = typeof body;
+      const options = {
+        method,
+        headers: {
+          authorization: `key ${apiKey}`,
+        },
+        credentials: 'include',
+      };
 
-    if (bodyType !== 'object') {
-      body = { data: body };
+      if (body) {
+        // make sure body is an object
+        const bodyType = typeof body;
+
+        if (bodyType !== 'object') {
+          body = { data: body };
+        }
+
+        if (body instanceof FormData) {
+          options.body = body;
+        } else {
+          options.headers['content-type'] = 'application/json';
+          options.body = JSON.stringify(body);
+        }
+      }
+
+      return fetch(requestUrl, options)
+        .then((res) => isOk(res, isJson))
     }
-
-    options.headers['content-type'] = 'application/json';
-    options.body = JSON.stringify(body);
-  }
-
-  return fetch(url, options)
-    .then(isOk)
+  })
 }
 
-export default sendRequest;
+export default createApiClient;
