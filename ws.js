@@ -55,9 +55,6 @@ const wsFactory = (ws) => ({
       id,
     });
   },
-  sendMessage(message) {
-    ws.send(JSON.stringify(message));
-  },
   joinUsersChannels(usersInformationCollection) {
     this.sendMessage({
       action: 'joinUsersChannels',
@@ -112,6 +109,13 @@ const wsFactory = (ws) => ({
   close(message) {
     message.action = 'close';
     this.sendMessage(message);
+  },
+  broadcast(message) {
+    message.action = 'broadcast';
+    this.sendMessage(message);
+  },
+  sendMessage(message) {
+    ws.send(JSON.stringify(message));
   },
 });
 
