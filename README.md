@@ -11,7 +11,7 @@ Link to the relevant script files in your HTML files
 
 2. Call the `createSdk` method from your JavaScript code with the Backpack’s unique URL and API key. 
 
-`const sdk = createSdk('https://mySweetApp.myDomain.com/', 'aLong&RandomApiKey');`
+`const sdk = createSdk('https://backpackName-be.myDomain.com/', 'aLong&RandomApiKey');`
 
 The object returned by `createSdk` exposes Backpack’s functionality through modules that each represent a core Backpack component: collection management, data persistence, user authentication, file storage, realtime communication over websockets. 
 
