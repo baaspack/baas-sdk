@@ -1,0 +1,24 @@
+{
+  "name": "baas-sdk",
+  "version": "1.0.0",
+  "description": "## Installing the SDK",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baaspack/baas-sdk.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/baaspack/baas-sdk/issues"
+  },
+  "homepage": "https://github.com/baaspack/baas-sdk#readme",
+  "devDependencies": {
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  }
+}
